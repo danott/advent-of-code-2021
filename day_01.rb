@@ -24,6 +24,10 @@ class TheTest < Minitest::Test
 end
 
 IncreasesAccumulator = Struct.new(:prev_depth, :increases) do
+  def self.compute(depths)
+    depths.reduce(new(depths.first, 0)) { |memo, depth| memo.next(depth) }.increases
+  end
+
   def next(depth)
     next_increases = depth > prev_depth ? increases + 1 : increases
     self.class.new(depth, next_increases)
@@ -32,7 +36,5 @@ end
 
 def count_increases(input)
   depths = input.lines.map(&:strip).map(&:to_i)
-  depths.reduce(IncreasesAccumulator.new(depths.first, 0)) do |counter, depth|
-    counter.next(depth)
-  end.increases
+  IncreasesAccumulator.compute(depths)
 end
