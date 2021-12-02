@@ -19,7 +19,7 @@ class TheTest < Minitest::Test
 
   def test_my_input
     input = File.read("./day_01.txt")
-    assert_equal 7, count_increases(input)
+    assert_equal 1390, count_increases(input)
   end
 end
 
