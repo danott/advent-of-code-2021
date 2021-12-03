@@ -35,26 +35,29 @@ class TheTest < Minitest::Test
   end
 end
 
+FaultyInterpreter = Struct.new(:instruction, :magnitude) do
+  def execute(position)
+    case instruction
+    when "forward"
+      Position.new(position.horizontal + magnitude, position.vertical)
+    when "down"
+      Position.new(position.horizontal, position.vertical + magnitude)
+    when "up"
+      Position.new(position.horizontal, position.vertical - magnitude)
+    end
+  end
+end
 
 Position = Struct.new(:horizontal, :vertical) do
   def self.parse(input)
-    horizontal = vertical = 0
-
-    input.lines.map(&:strip).each do |line|
-      direction, magnitude = line.split(" ")
-      magnitude = magnitude.to_i
-
-      case direction
-      when "forward"
-        horizontal += magnitude
-      when "down"
-        vertical += magnitude
-      when "up"
-        vertical -= magnitude
-      end
+    instructions = input.lines.map do |line|
+      instruction, magnitude = line.strip.split(" ")
+      FaultyInterpreter.new(instruction, magnitude.to_i)
     end
 
-    new(horizontal, vertical)
+    instructions.reduce(Position.new(0, 0)) do |position, instruction|
+      instruction.execute(position)
+    end
   end
 
   def product
