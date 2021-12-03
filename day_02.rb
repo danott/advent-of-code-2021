@@ -34,12 +34,29 @@ class TheTest < Minitest::Test
   end
 end
 
-class Position
+
+Position = Struct.new(:horizontal, :vertical) do
   def self.parse(input)
-    new
+    horizontal = vertical = 0
+
+    input.lines.map(&:strip).each do |line|
+      direction, magnitude = line.split(" ")
+      magnitude = magnitude.to_i
+
+      case direction
+      when "forward"
+        horizontal += magnitude
+      when "down"
+        vertical += magnitude
+      when "up"
+        vertical -= magnitude
+      end
+    end
+
+    new(horizontal, vertical)
   end
 
   def product
-    150
+    horizontal * vertical
   end
 end
