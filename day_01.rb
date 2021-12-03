@@ -45,7 +45,7 @@ class TheTest < Minitest::Test
   end
 
   def test_part_two_solution
-    assert_equal 5, count_window_increases(real_input)
+    assert_equal 1457, count_window_increases(real_input)
   end
 end
 
