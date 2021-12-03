@@ -66,11 +66,16 @@ def count_increases(input)
 end
 
 def count_window_increases(input)
-  remaining_depths = input.lines.map(&:strip).map(&:to_i)
-  depths = []
+  depths = input.lines.map(&:strip).map(&:to_i)
+  IncreasesAccumulator.compute(windowize_depths(depths))
+end
+
+def windowize_depths(depths)
+  remaining_depths = depths.dup
+  next_depths = []
   while remaining_depths.size > 2
-    depths.push(remaining_depths.first(3).sum)
+    next_depths.push(remaining_depths.first(3).sum)
     remaining_depths = remaining_depths.drop(1)
   end
-  IncreasesAccumulator.compute(depths)
+  next_depths
 end
