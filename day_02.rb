@@ -17,12 +17,12 @@ class TheTest < Minitest::Test
   end
 
   def test_part_one_example
-    position = Position.parse(example_input)
+    position = Position.parse(example_input, interpreter: FaultyInterpreter)
     assert_equal 150, position.product
   end
 
   def test_part_one_solution
-    position = Position.parse(real_input)
+    position = Position.parse(real_input, interpreter: FaultyInterpreter)
     assert_equal 1762050, position.product
   end
 
