@@ -1,6 +1,25 @@
 require "minitest/autorun"
 
 class TheTest < Minitest::Test
+  def test_input
+    <<~TEST_INPUT
+      199
+      200
+      208
+      210
+      200
+      207
+      240
+      269
+      260
+      263
+    TEST_INPUT
+  end
+
+  def real_input
+    File.read("./day_01.txt")
+  end
+
   def test_part_one_example
     input = <<~TEST_INPUT
       199
@@ -14,12 +33,11 @@ class TheTest < Minitest::Test
       260
       263
     TEST_INPUT
-    assert_equal 7, count_increases(input)
+    assert_equal 7, count_increases(test_input)
   end
 
   def test_part_one_solution
-    input = File.read("./day_01.txt")
-    assert_equal 1390, count_increases(input)
+    assert_equal 1390, count_increases(real_input)
   end
 end
 
