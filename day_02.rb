@@ -22,7 +22,8 @@ class TheTest < Minitest::Test
   end
 
   def test_part_one_solution
-    skip
+    position = Position.parse(real_input)
+    assert_equal 150, position.product
   end
 
   def test_part_two_example
