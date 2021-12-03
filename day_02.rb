@@ -55,11 +55,12 @@ RefinedInterpreter = Struct.new(:instruction, :magnitude) do
   def execute(position)
     case instruction
     when "forward"
-      Position.new(position.horizontal + magnitude, position.vertical)
+      vertical_change = magnitude * position.aim
+      Position.new(position.horizontal + magnitude, position.vertical + vertical_change, position.aim)
     when "down"
-      Position.new(position.horizontal, position.vertical + magnitude)
+      Position.new(position.horizontal, position.vertical, position.aim + magnitude)
     when "up"
-      Position.new(position.horizontal, position.vertical - magnitude)
+      Position.new(position.horizontal, position.vertical, position.aim - magnitude)
     end
   end
 end
