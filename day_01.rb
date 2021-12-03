@@ -39,6 +39,14 @@ class TheTest < Minitest::Test
   def test_part_one_solution
     assert_equal 1390, count_increases(real_input)
   end
+
+  def test_part_two_example
+    assert_equal 5, count_window_increases(test_input)
+  end
+
+  def test_part_two_solution
+    assert_equal 5, count_window_increases(real_input)
+  end
 end
 
 IncreasesAccumulator = Struct.new(:prev_depth, :increases) do
@@ -54,5 +62,15 @@ end
 
 def count_increases(input)
   depths = input.lines.map(&:strip).map(&:to_i)
+  IncreasesAccumulator.compute(depths)
+end
+
+def count_window_increases(input)
+  remaining_depths = input.lines.map(&:strip).map(&:to_i)
+  depths = []
+  while remaining_depths.size > 2
+    depths.push(remaining_depths.first(3).sum)
+    remaining_depths = remaining_depths.drop(1)
+  end
   IncreasesAccumulator.compute(depths)
 end
