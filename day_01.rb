@@ -1,8 +1,8 @@
 require "minitest/autorun"
 
 class TheTest < Minitest::Test
-  def test_input
-    <<~TEST_INPUT
+  def example_input
+    <<~EXAMPLE_INPUT
       199
       200
       208
@@ -13,7 +13,7 @@ class TheTest < Minitest::Test
       269
       260
       263
-    TEST_INPUT
+    EXAMPLE_INPUT
   end
 
   def real_input
@@ -21,19 +21,7 @@ class TheTest < Minitest::Test
   end
 
   def test_part_one_example
-    input = <<~TEST_INPUT
-      199
-      200
-      208
-      210
-      200
-      207
-      240
-      269
-      260
-      263
-    TEST_INPUT
-    assert_equal 7, count_increases(test_input)
+    assert_equal 7, count_increases(example_input)
   end
 
   def test_part_one_solution
@@ -41,7 +29,7 @@ class TheTest < Minitest::Test
   end
 
   def test_part_two_example
-    assert_equal 5, count_window_increases(test_input)
+    assert_equal 5, count_window_increases(example_input)
   end
 
   def test_part_two_solution
