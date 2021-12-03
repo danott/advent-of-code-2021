@@ -49,10 +49,10 @@ FaultyInterpreter = Struct.new(:instruction, :magnitude) do
 end
 
 Position = Struct.new(:horizontal, :vertical) do
-  def self.parse(input)
+  def self.parse(input, interpreter: FaultyInterpreter)
     instructions = input.lines.map do |line|
       instruction, magnitude = line.strip.split(" ")
-      FaultyInterpreter.new(instruction, magnitude.to_i)
+      interpreter.new(instruction, magnitude.to_i)
     end
 
     instructions.reduce(Position.new(0, 0)) do |position, instruction|
