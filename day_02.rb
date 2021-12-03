@@ -23,7 +23,7 @@ class TheTest < Minitest::Test
 
   def test_part_one_solution
     position = Position.parse(real_input)
-    assert_equal 150, position.product
+    assert_equal 1762050, position.product
   end
 
   def test_part_two_example
