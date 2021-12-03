@@ -34,7 +34,8 @@ class TheTest < Minitest::Test
   end
 
   def test_part_two_solution
-    skip
+    position = Position.parse(real_input, interpreter: RefinedInterpreter)
+    assert_equal 900, position.product
   end
 end
 
