@@ -27,7 +27,10 @@ class TheTest < Minitest::Test
   end
 
   def test_part_two_example
-    skip
+    position = Position.parse(example_input, interpreter: RefinedInterpreter)
+    assert_equal 15, position.horizontal
+    assert_equal 60, position.vertical
+    assert_equal 900, position.product
   end
 
   def test_part_two_solution
@@ -48,14 +51,27 @@ FaultyInterpreter = Struct.new(:instruction, :magnitude) do
   end
 end
 
-Position = Struct.new(:horizontal, :vertical) do
+RefinedInterpreter = Struct.new(:instruction, :magnitude) do
+  def execute(position)
+    case instruction
+    when "forward"
+      Position.new(position.horizontal + magnitude, position.vertical)
+    when "down"
+      Position.new(position.horizontal, position.vertical + magnitude)
+    when "up"
+      Position.new(position.horizontal, position.vertical - magnitude)
+    end
+  end
+end
+
+Position = Struct.new(:horizontal, :vertical, :aim) do
   def self.parse(input, interpreter: FaultyInterpreter)
     instructions = input.lines.map do |line|
       instruction, magnitude = line.strip.split(" ")
       interpreter.new(instruction, magnitude.to_i)
     end
 
-    instructions.reduce(Position.new(0, 0)) do |position, instruction|
+    instructions.reduce(Position.new(0, 0, 0)) do |position, instruction|
       instruction.execute(position)
     end
   end
