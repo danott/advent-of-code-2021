@@ -37,6 +37,10 @@ class Day3Test < Minitest::Test
     assert_equal 10, CO2ScrubberRating.new(example_input).to_i
     assert_equal 230, LifeSupportRating.new(example_input).to_i
   end
+
+  def test_solution_part_two
+    assert_equal 6775520, LifeSupportRating.new(real_input).to_i
+  end
 end
 
 PowerConsumption = Struct.new(:measurements) do
