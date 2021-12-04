@@ -2,7 +2,7 @@ require "minitest/autorun"
 
 class Day3Test < Minitest::Test
   def example_input
-    <<~EXAMPLE_INPUT
+    <<~EXAMPLE_INPUT.lines.map(&:strip)
       00100
       11110
       10110
@@ -19,7 +19,7 @@ class Day3Test < Minitest::Test
   end
 
   def real_input
-    File.read("./day_03.txt")
+    File.readlines("./day_03.txt").map(&:strip)
   end
 
   def test_example_part_one
@@ -36,8 +36,7 @@ class Day3Test < Minitest::Test
 end
 
 Report = Struct.new(:gamma_rate, :epsilon_rate) do
-  def self.parse(input)
-    measurements = input.lines.map(&:strip)
+  def self.parse(measurements)
     gamma_rate = most_common_digit(measurements).to_i(2)
     epsilon_rate = least_common_digit(measurements).to_i(2)
     new(gamma_rate, epsilon_rate)
