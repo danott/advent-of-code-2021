@@ -23,42 +23,58 @@ class Day3Test < Minitest::Test
   end
 
   def test_example_part_one
-    report = Report.parse(example_input)
-    assert_equal 22, report.gamma_rate
-    assert_equal 9, report.epsilon_rate
-    assert_equal 198, report.power_consumption
+    assert_equal 22, GammaRate.new(example_input).to_i
+    assert_equal 9, EpsilonRate.new(example_input).to_i
+    assert_equal 198, PowerConsumption.new(example_input).to_i
   end
 
   def test_solution_part_one
-    report = Report.parse(real_input)
-    assert_equal 2261546, report.power_consumption
+    assert_equal 2261546, PowerConsumption.new(real_input).to_i
   end
 end
 
-Report = Struct.new(:gamma_rate, :epsilon_rate) do
-  def self.parse(measurements)
-    gamma_rate = most_common_digit(measurements).to_i(2)
-    epsilon_rate = least_common_digit(measurements).to_i(2)
-    new(gamma_rate, epsilon_rate)
-  end
-
-  def power_consumption
-    gamma_rate * epsilon_rate
+PowerConsumption = Struct.new(:measurements) do
+  def to_i
+    GammaRate.new(measurements).to_i * EpsilonRate.new(measurements).to_i
   end
 end
 
-def most_common_digit(measurements)
-  counts = measurements.reduce([0] * measurements.first.size) do |memo, measurement|
-    memo.zip(measurement.chars.map(&:to_i)).map(&:sum)
-  end.map do |digit|
-    digit > measurements.size / 2 ? "1" : "0"
-  end.join
+GammaRate = Struct.new(:measurements) do
+  def value
+    measurements.map(&:chars).transpose.map { |column| most_occurring(column, tie: "0") }.join
+  end
+
+  def to_i
+    value.to_i(2)
+  end
 end
 
-def least_common_digit(measurements)
-  invert(most_common_digit(measurements))
+EpsilonRate = Struct.new(:measurements) do
+  def value
+    measurements.map(&:chars).transpose.map { |column| least_occurring(column, tie: "0") }.join
+  end
+
+  def to_i
+    value.to_i(2)
+  end
 end
 
-def invert(measurement)
-  measurement.chars.map { |c| c == "0" ? "1" : "0" }.join
+def least_occurring(chars, tie: "0")
+  tally = chars.tally.invert
+  case tally.keys.size
+  when 1
+    tie
+  else
+    tally[tally.keys.min]
+  end
+end
+
+def most_occurring(chars, tie: "0")
+  tally = chars.tally.invert
+  case tally.keys.size
+  when 1
+    tie
+  else
+    tally[tally.keys.max]
+  end
 end
