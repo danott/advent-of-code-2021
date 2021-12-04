@@ -38,23 +38,28 @@ end
 Report = Struct.new(:gamma_rate, :epsilon_rate) do
   def self.parse(input)
     measurements = input.lines.map(&:strip)
-
-    counts = measurements.reduce([0] * measurements.first.size) do |memo, measurement|
-      memo.zip(measurement.chars.map(&:to_i)).map(&:sum)
-    end
-
-    gamma_rate = counts.map do |digit|
-      digit > measurements.size / 2 ? "1" : "0"
-    end.join.to_i(2)
-
-    epsilon_rate = counts.map do |digit|
-      digit > measurements.size / 2 ? "0" : "1"
-    end.join.to_i(2)
-
+    gamma_rate = most_common_digit(measurements).to_i(2)
+    epsilon_rate = least_common_digit(measurements).to_i(2)
     new(gamma_rate, epsilon_rate)
   end
 
   def power_consumption
     gamma_rate * epsilon_rate
   end
+end
+
+def most_common_digit(measurements)
+  counts = measurements.reduce([0] * measurements.first.size) do |memo, measurement|
+    memo.zip(measurement.chars.map(&:to_i)).map(&:sum)
+  end.map do |digit|
+    digit > measurements.size / 2 ? "1" : "0"
+  end.join
+end
+
+def least_common_digit(measurements)
+  invert(most_common_digit(measurements))
+end
+
+def invert(measurement)
+  measurement.chars.map { |c| c == "0" ? "1" : "0" }.join
 end
