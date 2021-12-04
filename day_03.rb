@@ -31,7 +31,7 @@ class Day3Test < Minitest::Test
 
   def test_solution_part_one
     report = Report.parse(real_input)
-    assert_equal 198, report.power_consumption
+    assert_equal 2261546, report.power_consumption
   end
 end
 
