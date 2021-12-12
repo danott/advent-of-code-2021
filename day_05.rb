@@ -18,12 +18,12 @@ REAL_INPUT = File.read("day_05.txt")
 class VentTest < Minitest::Test
   def test_example_part_one
     vent = Vent.parse(EXAMPLE_INPUT)
-    assert_equal 5, vent.overlap
+    assert_equal 5, vent.without_diagonals.overlap
   end
 
   def test_solution_part_one
     vent = Vent.parse(REAL_INPUT)
-    assert_equal 5, vent.overlap
+    assert_equal 6687, vent.without_diagonals.overlap
   end
 
   def test_example_part_two
@@ -43,8 +43,12 @@ Vent = Struct.new(:lines) do
     new(lines)
   end
 
+  def without_diagonals
+    self.class.new(lines.reject(&:diagonal?))
+  end
+
   def overlap
-    lines.reject(&:diagonal?).flat_map(&:points).tally.select { |k, v| v >= 2 }.size
+    lines.flat_map(&:points).tally.select { |k, v| v >= 2 }.size
   end
 end
 
