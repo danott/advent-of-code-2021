@@ -26,33 +26,29 @@ REAL_INPUT = File.read("day_04.txt")
 
 class BingoTest < Minitest::Test
   def test_example_part_one
-    scorer = Scorer.parse(EXAMPLE_INPUT, criteria: PartOneCriteria)
-    scorer.next until scorer.win?
+    scorer = Scorer.parse(EXAMPLE_INPUT, criteria: PartOneCriteria).run
     assert_equal 4512, scorer.score
   end
 
   def test_solution_part_one
-    scorer = Scorer.parse(REAL_INPUT, criteria: PartOneCriteria)
-    scorer.next until scorer.win?
+    scorer = Scorer.parse(REAL_INPUT, criteria: PartOneCriteria).run
     assert_equal 33462, scorer.score
   end
 
   def test_example_part_two
-    scorer = Scorer.parse(EXAMPLE_INPUT, criteria: PartTwoCriteria)
-    scorer.next until scorer.win?
+    scorer = Scorer.parse(EXAMPLE_INPUT, criteria: PartTwoCriteria).run
     assert_equal 1924, scorer.score
   end
 
   def test_solution_part_two
-    scorer = Scorer.parse(REAL_INPUT, criteria: PartTwoCriteria)
-    scorer.next until scorer.win?
+    scorer = Scorer.parse(REAL_INPUT, criteria: PartTwoCriteria).run
     assert_equal 30070, scorer.score
   end
 end
 
 PartOneCriteria = Struct.new(:scorer) do
-  def win?
-    scorer.boards.any?(&:win?)
+  def run
+    scorer.next until scorer.boards.any?(&:win?)
   end
 
   def score
@@ -61,8 +57,8 @@ PartOneCriteria = Struct.new(:scorer) do
 end
 
 PartTwoCriteria = Struct.new(:scorer) do
-  def win?
-    scorer.boards.all?(&:win?)
+  def run
+    scorer.next until scorer.boards.all?(&:win?)
   end
 
   def score
@@ -95,14 +91,15 @@ class Scorer
     new(boards: boards, remaining_numbers: remaining_numbers, criteria: criteria)
   end
 
-  def win?
-    criteria.win?
-  end
-
   def next
     next_number = remaining_numbers.shift
     boards.each { |b| b.mark(next_number) }
     called_numbers.push next_number
+    self
+  end
+
+  def run
+    criteria.run
     self
   end
 
@@ -111,13 +108,7 @@ class Scorer
   end
 end
 
-class Board
-  attr_reader :rows
-
-  def initialize(rows)
-    @rows = rows
-  end
-
+Board = Struct.new(:rows) do
   def self.parse(input)
     new input.lines.map { |l| Row.parse(l) }
   end
@@ -141,18 +132,7 @@ class Board
   end
 end
 
-class Row
-  attr_reader :cells
-  
-  def initialize(cells)
-    @cells = cells
-  end
-
-  def mark(number)
-    cells.each { |c| c.mark(number) }
-    self
-  end
-
+Row = Struct.new(:cells) do
   def self.parse(line)
     new line.gsub(/\s+/, " ").split(" ").map { |s| Cell.new(s.to_i) }
   end
@@ -160,21 +140,19 @@ class Row
   def win?
     cells.all?(&:marked?)
   end
-end
-
-class Cell
-  attr_reader :value
-
-  def initialize(value)
-    @value = value
-    @marked = false
-  end
 
   def mark(number)
-    @marked = true if value == number
+    cells.each { |c| c.mark(number) }
+    self
+  end
+end
+
+Cell = Struct.new(:value, :marked) do
+  def mark(number)
+    self.marked = true if value == number
   end
 
   def marked?
-    @marked
+    marked
   end
 end
