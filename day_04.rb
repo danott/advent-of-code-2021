@@ -22,41 +22,81 @@ EXAMPLE_INPUT = <<~BINGO
  2  0 12  3  7
 BINGO
 
+REAL_INPUT = File.read("day_04.txt")
+
 class BingoTest < Minitest::Test
   def test_example_part_one
-    scorer = Scorer.parse(EXAMPLE_INPUT)
+    scorer = Scorer.parse(EXAMPLE_INPUT, criteria: PartOneCriteria)
     scorer.next until scorer.win?
     assert_equal 4512, scorer.score
   end
 
   def test_solution_part_one
-    scorer = Scorer.parse(File.read("day_04.txt"))
+    scorer = Scorer.parse(REAL_INPUT, criteria: PartOneCriteria)
     scorer.next until scorer.win?
     assert_equal 33462, scorer.score
+  end
+
+  def test_example_part_two
+    scorer = Scorer.parse(EXAMPLE_INPUT, criteria: PartTwoCriteria)
+    scorer.next until scorer.win?
+    assert_equal 1924, scorer.score
+  end
+
+  def test_solution_part_two
+    scorer = Scorer.parse(REAL_INPUT, criteria: PartTwoCriteria)
+    scorer.next until scorer.win?
+    assert_equal 30070, scorer.score
+  end
+end
+
+PartOneCriteria = Struct.new(:scorer) do
+  def win?
+    scorer.boards.any?(&:win?)
+  end
+
+  def score
+    scorer.boards.find(&:win?).score * scorer.called_numbers.last
+  end
+end
+
+PartTwoCriteria = Struct.new(:scorer) do
+  def win?
+    scorer.boards.all?(&:win?)
+  end
+
+  def score
+    last_number = scorer.called_numbers.last
+    board = scorer.boards.find do |b| 
+      b.rows.flat_map(&:cells).select(&:marked?).map(&:value).include? last_number
+    end
+    board.score * last_number
   end
 end
 
 class Scorer
   attr_reader :boards
+  attr_reader :criteria
   attr_reader :called_numbers
   attr_reader :remaining_numbers
   
-  def initialize(boards:, remaining_numbers:)
+  def initialize(boards:, remaining_numbers:, criteria: PartOneCriteria)
     @boards = boards
     @remaining_numbers = remaining_numbers
     @called_numbers = []
+    @criteria = criteria.new(self)
   end
 
-  def self.parse(input)
+  def self.parse(input, criteria:)
     paragraphs = input.split("\n\n")
     remaining_numbers = paragraphs.shift.split(",").map(&:to_i)
     boards = paragraphs.map { |p| Board.parse(p) }
     
-    new(boards: boards, remaining_numbers: remaining_numbers)
+    new(boards: boards, remaining_numbers: remaining_numbers, criteria: criteria)
   end
 
   def win?
-    boards.any?(&:win?)
+    criteria.win?
   end
 
   def next
@@ -67,7 +107,7 @@ class Scorer
   end
 
   def score
-    boards.find(&:win?).score * called_numbers.last
+    criteria.score
   end
 end
 
@@ -87,6 +127,7 @@ class Board
   end
 
   def mark(number)
+    return self if win?
     rows.each { |r| r.mark(number) }
     self
   end
