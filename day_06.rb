@@ -31,8 +31,9 @@ end
 
 School = Struct.new(:tally) do
   def self.parse(digits)
-    digits = digits.split(",").map(&:to_i)
-    new(digits.tally)
+    baseline_tally = { 0 => 0, 1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0, 7 => 0, 8 => 0 }
+    parsed = digits.split(",").map(&:to_i)
+    new(baseline_tally.merge(parsed.tally))
   end
 
   def count
@@ -45,15 +46,15 @@ School = Struct.new(:tally) do
 
   def next
     next_tally = {
-      0 => tally.fetch(1, 0),
-      1 => tally.fetch(2, 0),
-      2 => tally.fetch(3, 0),
-      3 => tally.fetch(4, 0),
-      4 => tally.fetch(5, 0),
-      5 => tally.fetch(6, 0),
-      6 => tally.fetch(0, 0) + tally.fetch(7, 0),
-      7 => tally.fetch(8, 0),
-      8 => tally.fetch(0, 0),
+      0 => tally.fetch(1),
+      1 => tally.fetch(2),
+      2 => tally.fetch(3),
+      3 => tally.fetch(4),
+      4 => tally.fetch(5),
+      5 => tally.fetch(6),
+      6 => tally.fetch(7) + tally.fetch(0),
+      7 => tally.fetch(8),
+      8 => tally.fetch(0),
     }
     self.class.new(next_tally)
   end
