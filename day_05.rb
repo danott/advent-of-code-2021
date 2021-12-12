@@ -83,18 +83,10 @@ Line = Struct.new(:endpoints) do
     when min_y == max_y
       min_x.upto(max_x).map { |x| Point.new(x, min_y) }
     else
-      horizontal = []
-      vertical = []
-
-      left, right = endpoints.sort_by(&:x)
-      horizontal = left.x.upto(right.x).to_a
-
-      if left.y < right.y
-        vertical = left.y.upto(right.y).to_a
-      else
-        vertical = left.y.downto(right.y).to_a
-      end
-      
+      start, finish = endpoints.sort_by(&:x)
+      vertical_direction = start.y < finish.y ? :upto : :downto
+      horizontal = start.x.upto(finish.x).to_a
+      vertical = start.y.send(vertical_direction, finish.y).to_a
       horizontal.zip(vertical).map { |x, y| Point.new(x, y) }
     end
   end
