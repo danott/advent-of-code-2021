@@ -28,6 +28,12 @@ class BingoTest < Minitest::Test
     scorer.next until scorer.win?
     assert_equal 4512, scorer.score
   end
+
+  def test_solution_part_one
+    scorer = Scorer.parse(File.read("day_04.txt"))
+    scorer.next until scorer.win?
+    assert_equal 33462, scorer.score
+  end
 end
 
 class Scorer
