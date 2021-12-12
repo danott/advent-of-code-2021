@@ -27,11 +27,13 @@ class VentTest < Minitest::Test
   end
 
   def test_example_part_two
-    skip
+    vent = Vent.parse(EXAMPLE_INPUT)
+    assert_equal 12, vent.overlap
   end
 
   def test_solution_part_two
-    skip
+    vent = Vent.parse(REAL_INPUT)
+    assert_equal 19851, vent.overlap
   end
 end
 
@@ -75,10 +77,25 @@ Line = Struct.new(:endpoints) do
   end
 
   def points
-    min_x.upto(max_x).flat_map do |x|
-      min_y.upto(max_y).map do |y|
-        Point.new(x, y)
+    case
+    when min_x == max_x
+      min_y.upto(max_y).map { |y| Point.new(min_x, y) }
+    when min_y == max_y
+      min_x.upto(max_x).map { |x| Point.new(x, min_y) }
+    else
+      horizontal = []
+      vertical = []
+
+      left, right = endpoints.sort_by(&:x)
+      horizontal = left.x.upto(right.x).to_a
+
+      if left.y < right.y
+        vertical = left.y.upto(right.y).to_a
+      else
+        vertical = left.y.downto(right.y).to_a
       end
+      
+      horizontal.zip(vertical).map { |x, y| Point.new(x, y) }
     end
   end
 
