@@ -25,16 +25,109 @@ BINGO
 class BingoTest < Minitest::Test
   def test_example_part_one
     scorer = Scorer.parse(EXAMPLE_INPUT)
+    scorer.next until scorer.win?
     assert_equal 4512, scorer.score
   end
 end
 
 class Scorer
+  attr_reader :boards
+  attr_reader :called_numbers
+  attr_reader :remaining_numbers
+  
+  def initialize(boards:, remaining_numbers:)
+    @boards = boards
+    @remaining_numbers = remaining_numbers
+    @called_numbers = []
+  end
+
   def self.parse(input)
-    new
+    paragraphs = input.split("\n\n")
+    remaining_numbers = paragraphs.shift.split(",").map(&:to_i)
+    boards = paragraphs.map { |p| Board.parse(p) }
+    
+    new(boards: boards, remaining_numbers: remaining_numbers)
+  end
+
+  def win?
+    boards.any?(&:win?)
+  end
+
+  def next
+    next_number = remaining_numbers.shift
+    boards.each { |b| b.mark(next_number) }
+    called_numbers.push next_number
+    self
   end
 
   def score
-    4512
+    boards.find(&:win?).score * called_numbers.last
+  end
+end
+
+class Board
+  attr_reader :rows
+
+  def initialize(rows)
+    @rows = rows
+  end
+
+  def self.parse(input)
+    new input.lines.map { |l| Row.parse(l) }
+  end
+
+  def columns
+    rows.map(&:cells).transpose.map { |cells| Row.new(cells) }
+  end
+
+  def mark(number)
+    rows.each { |r| r.mark(number) }
+    self
+  end
+
+  def win?
+    (rows + columns).flatten.any?(&:win?)
+  end
+
+  def score
+    rows.flat_map(&:cells).reject(&:marked?).sum(&:value)
+  end
+end
+
+class Row
+  attr_reader :cells
+  
+  def initialize(cells)
+    @cells = cells
+  end
+
+  def mark(number)
+    cells.each { |c| c.mark(number) }
+    self
+  end
+
+  def self.parse(line)
+    new line.gsub(/\s+/, " ").split(" ").map { |s| Cell.new(s.to_i) }
+  end
+
+  def win?
+    cells.all?(&:marked?)
+  end
+end
+
+class Cell
+  attr_reader :value
+
+  def initialize(value)
+    @value = value
+    @marked = false
+  end
+
+  def mark(number)
+    @marked = true if value == number
+  end
+
+  def marked?
+    @marked
   end
 end
